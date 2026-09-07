@@ -1,0 +1,16 @@
+import { useState } from "react";
+import { Building2, LockKeyhole, Mail, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import "./Login.css";
+
+const roles = [
+  { name: "Resident", icon: UserRound, note: "Access your home, payments and community" },
+  { name: "Admin", icon: UsersRound, note: "Manage residents, requests and operations" },
+  { name: "Security Guard", icon: ShieldCheck, note: "Monitor visitors and safety activity" },
+];
+const people = { Resident: { name: "Arjun Mehta", flat: "Flat A-1203" }, Admin: { name: "Kavita Rao", flat: "Society Administrator" }, "Security Guard": { name: "Ramesh Patil", flat: "Security Desk" } };
+
+export default function Login({ onLogin }) {
+  const [role, setRole] = useState("Resident"), [email, setEmail] = useState(""), [password, setPassword] = useState(""), [error, setError] = useState("");
+  const login = (event) => { event.preventDefault(); if (!email.trim() || !password.trim()) return setError("Enter your email and password to continue."); const localPart = email.split("@")[0].replace(/[._-]+/g, " "); const name = role === "Resident" ? (localPart.replace(/\b\w/g, letter => letter.toUpperCase()) || "New Resident") : people[role].name; const flat = role === "Resident" ? "Flat pending assignment" : people[role].flat; localStorage.setItem("smartSocietyToken", "demo-session"); onLogin({ role, email, name, flat }); };
+  return <main className="login-page"><section className="login-intro"><div className="login-brand"><span><Building2 size={27}/></span><div><b>MY</b><strong>APARTMENT</strong><small>Better Living. Together.</small></div></div><div className="login-copy"><span>WELCOME HOME</span><h1>Everything your community needs, in one place.</h1><p>Stay connected with your home, neighbours and apartment services from a single secure portal.</p></div><div className="login-features"><p><ShieldCheck size={18}/> Secure role-based access</p><p><Building2 size={18}/> Built for modern apartments</p></div></section><section className="login-panel"><form className="login-card" onSubmit={login}><div><span className="eyebrow">SIGN IN</span><h2>Welcome back</h2><p>Select your account type and sign in to continue.</p></div><fieldset><legend>Sign in as</legend><div className="role-options">{roles.map(({name,icon:Icon,note})=><button type="button" key={name} className={role===name?"selected":""} onClick={()=>{setRole(name);setError("")}}><Icon size={19}/><span><b>{name}</b><small>{note}</small></span></button>)}</div></fieldset><label>Email address<span className="login-input"><Mail size={17}/><input value={email} onChange={e=>setEmail(e.target.value)} type="email" placeholder="name@example.com"/></span></label><label>Password<span className="login-input"><LockKeyhole size={17}/><input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="Enter your password"/></span></label>{error&&<p className="login-error">{error}</p>}<div className="login-row"><label className="remember"><input type="checkbox"/> Remember me</label><button type="button" onClick={()=>setError("Please contact your apartment administrator to reset your password.")}>Forgot password?</button></div><button className="login-submit">Sign in as {role}</button><small className="login-help">For demo access, use any email and password.</small></form></section></main>;
+}
